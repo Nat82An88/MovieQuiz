@@ -114,6 +114,8 @@ final class MovieQuizViewController: UIViewController {
                 buttonText: "Сыграть ещё раз")
             show(quiz: viewModel)
         } else {
+            imageView.layer.borderWidth = 0
+            imageView.layer.borderColor = nil
             currentQuestionIndex += 1
             
             let nextQuestion = questions[currentQuestionIndex]
