@@ -22,6 +22,8 @@ final class MovieQuizViewController: UIViewController {
     }
     
     // Mark: - IB Outlets
+    @IBOutlet private var yesButton: UIButton!
+    @IBOutlet private var noButton: UIButton!
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
@@ -84,14 +86,14 @@ final class MovieQuizViewController: UIViewController {
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         let currentQuestion = questions[currentQuestionIndex]
         let answer = true
-        
+        changeSateButton(isEnabled: false)
         showAnswerResult(isCorrect: answer == currentQuestion.correctAnswer)
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         let currentQuestion = questions[currentQuestionIndex]
         let answer = false
-        
+        changeSateButton(isEnabled: false)
         showAnswerResult(isCorrect: answer == currentQuestion.correctAnswer)
     }
     
@@ -125,6 +127,7 @@ final class MovieQuizViewController: UIViewController {
     }
     
     private func showNextQuestionOrResults() {
+        changeSateButton(isEnabled: true)
         if currentQuestionIndex == questions.count - 1 {
             let text = "Ваш результат: \(correctAnswers)/10"
             let viewModel = QuizResultsViewModel(
@@ -136,10 +139,8 @@ final class MovieQuizViewController: UIViewController {
             imageView.layer.borderWidth = 0
             imageView.layer.borderColor = nil
             currentQuestionIndex += 1
-            
             let nextQuestion = questions[currentQuestionIndex]
             let viewModel = convert(model: nextQuestion)
-            
             show(quiz: viewModel)
         }
     }
@@ -153,8 +154,8 @@ final class MovieQuizViewController: UIViewController {
         let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
-            
             self.imageView.layer.borderWidth = 0
+            
             let firstQuestion = self.questions[self.currentQuestionIndex]
             let viewModel = self.convert(model: firstQuestion)
             self.show(quiz: viewModel)
@@ -163,6 +164,11 @@ final class MovieQuizViewController: UIViewController {
         alert.addAction(action)
         
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    private func changeSateButton(isEnabled: Bool) {
+        noButton.isEnabled = isEnabled
+        yesButton.isEnabled = isEnabled
     }
 }
 
