@@ -11,21 +11,21 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private weak var counterLabel: UILabel!
     
     // MARK: - Private Properties
-    
+    private lazy var alertPresenter = AlertPresenter(viewController: self)
     private var currentQuestionIndex: Int = .zero
     private var correctAnswers: Int = .zero
     private let questionsAmount: Int = 10
-    private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
+    private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
     
     // MARK: - View Life Cycles
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let questionFactory = QuestionFactory()
-        questionFactory.setup(delegate: self)
-        self.questionFactory = questionFactory
+
+        questionFactory = QuestionFactory(delegate: self)
+
+        questionFactory?.requestNextQuestion() 
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -107,28 +107,24 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             imageView.layer.borderWidth = 0
             imageView.layer.borderColor = nil
             currentQuestionIndex += 1
-            questionFactory.requestNextQuestion()
+            questionFactory?.requestNextQuestion()
         }
     }
     
     private func show(quiz result: QuizResultsViewModel) {
-        let alert = UIAlertController(
+        let alertModel = AlertModel(
             title: result.title,
             message: result.text,
-            preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
-            self.imageView.layer.borderWidth = 0
-            self.questionFactory.requestNextQuestion()
-        }
-        
-        alert.addAction(action)
-        
-        self.present(alert, animated: true, completion: nil)
+            buttonText: result.buttonText,
+            completion:{ [weak self] in
+                guard let self = self else { return }
+                self.currentQuestionIndex = 0
+                self.correctAnswers = 0
+                self.imageView.layer.borderWidth = 0
+                self.questionFactory?.requestNextQuestion()
+            }
+        )
+        alertPresenter.presentAlert(with: alertModel)
     }
     
     private func changeSateButton(isEnabled: Bool) {
