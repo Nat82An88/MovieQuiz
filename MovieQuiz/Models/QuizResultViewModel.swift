@@ -1,10 +1,3 @@
-//
-//  QuizResultViewModel.swift
-//  MovieQuiz
-//
-//  Created by Андрей Васенков on 2.04.25.
-//
-
 import Foundation
 
  struct QuizResultsViewModel {

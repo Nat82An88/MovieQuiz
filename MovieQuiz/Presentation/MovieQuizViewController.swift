@@ -11,21 +11,24 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private weak var counterLabel: UILabel!
     
     // MARK: - Private Properties
+    
     private lazy var alertPresenter = AlertPresenter(viewController: self)
     private var currentQuestionIndex: Int = .zero
     private var correctAnswers: Int = .zero
     private let questionsAmount: Int = 10
+    private var statisticServise: StatisticServiceProtocol = StatisticService()
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
+    private var gamesCount: Int = .zero
     
     // MARK: - View Life Cycles
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         questionFactory = QuestionFactory(delegate: self)
-
-        questionFactory?.requestNextQuestion() 
+        questionFactory?.requestNextQuestion()
+        statisticServise = StatisticService()
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -34,7 +37,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         guard let question = question else {
             return
         }
-        
         currentQuestion = question
         let viewModel = convert(model: question)
         
@@ -83,7 +85,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         if isCorrect {
             correctAnswers += 1
         }
-        
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
@@ -94,10 +95,18 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    private func saveGameResults(correct: Int, total: Int) {
+        statisticServise.store(correct: correct, total: total)
+    }
+    
     private func showNextQuestionOrResults() {
         changeSateButton(isEnabled: true)
         if currentQuestionIndex == questionsAmount - 1 {
-            let text = "Ваш результат: \(correctAnswers)/10"
+            saveGameResults(correct: correctAnswers, total: questionsAmount)
+            let text = "Ваш результат: \(correctAnswers)/\(questionsAmount)\n" +
+            "Количество сыгранных квизов:\(statisticServise.gamesCount)\n" +
+            "Рекорд:\(statisticServise.bestGame.correct)/\(statisticServise.bestGame.total)(\(statisticServise.bestGame.date.dateTimeString))\n" +
+            "Средняя точность:\(String(format: "%.2f", statisticServise.totalAccuracy))%"
             let viewModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
                 text: text,
