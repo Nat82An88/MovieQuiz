@@ -2,19 +2,7 @@ import Foundation
 
 final class StatisticServiceImplementation: StatisticService {
     
-    // MARK: - Private Properties
-    
-    private let storage: UserDefaults = .standard
-    private enum Keys: String {
-        case bestGameCorrect
-        case bestGameTotal
-        case bestGameDate
-        case totalCorrectAnswers
-        case totalQuestions
-        case gamesCount
-    }
-    
-    //MARK: - Computed Properties
+    //MARK: - Public Properties
     
     var gamesCount: Int {
         get {
@@ -42,14 +30,24 @@ final class StatisticServiceImplementation: StatisticService {
     var totalAccuracy: Double {
         let totalCorrect = storage.integer(forKey: Keys.totalCorrectAnswers.rawValue)
         let totalQuestions = storage.integer(forKey: Keys.totalQuestions.rawValue)
-        guard totalQuestions > 0 else {
-            return 0.0
-        }
+        guard totalQuestions > 0 else {return 0.0}
         let accuracy = Double(totalCorrect) / Double(totalQuestions) * 100
         return accuracy
     }
     
-    //MARK: - Methods
+    // MARK: - Private Propertie
+    
+    private let storage: UserDefaults = .standard
+    private enum Keys: String {
+        case bestGameCorrect
+        case bestGameTotal
+        case bestGameDate
+        case totalCorrectAnswers
+        case totalQuestions
+        case gamesCount
+    }
+    
+    // MARK: - Public Methods
     
     func store(correct count: Int, total amount: Int) {
         let currentTotalCorrect = storage.integer(forKey: Keys.totalCorrectAnswers.rawValue)
@@ -57,7 +55,6 @@ final class StatisticServiceImplementation: StatisticService {
         storage.set(currentTotalCorrect + count, forKey: Keys.totalCorrectAnswers.rawValue)
         storage.set(currentTotalQuestions + amount, forKey: Keys.totalQuestions.rawValue)
         gamesCount += 1
-        
         let newGameResult = GameResult(correct: count, total: amount, date: Date())
         if newGameResult.isBetter(than: bestGame) {
             bestGame = newGameResult
