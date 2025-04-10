@@ -1,6 +1,6 @@
 import Foundation
 
-final class StatisticService: StatisticServiceProtocol {
+final class StatisticServiceImplementation: StatisticService {
     
     // MARK: - Private Properties
     
