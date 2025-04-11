@@ -34,9 +34,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - QuestionFactoryDelegate
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        guard let question = question else {
-            return
-        }
+        guard let question else { return }
         currentQuestion = question
         let viewModel = convert(model: question)
         
@@ -48,18 +46,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - IB Actions
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
+        guard let currentQuestion else { return }
         let answer = true
         changeSateButton(isEnabled: false)
         showAnswerResult(isCorrect: answer == currentQuestion.correctAnswer)
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
+        guard let currentQuestion else { return }
         let answer = false
         changeSateButton(isEnabled: false)
         showAnswerResult(isCorrect: answer == currentQuestion.correctAnswer)
@@ -126,7 +120,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             message: result.text,
             buttonText: result.buttonText,
             completion:{ [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.currentQuestionIndex = 0
                 self.correctAnswers = 0
                 self.imageView.layer.borderWidth = 0
