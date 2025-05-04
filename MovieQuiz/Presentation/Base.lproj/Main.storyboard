@@ -71,6 +71,7 @@
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dh4-Ol-ulz" userLabel="No Button">
                                                 <rect key="frame" x="0.0" y="0.0" width="166.66666666666666" height="60"/>
                                                 <color key="backgroundColor" name="YP White"/>
+                                                <accessibility key="accessibilityConfiguration" identifier="No"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="60" id="jIU-cR-2h5"/>
                                                 </constraints>
