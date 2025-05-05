@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+final class MovieQuizViewController: UIViewController {
    
     // MARK: - IB Outlets
     
@@ -15,7 +15,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private lazy var alertPresenter = AlertPresenter(viewController: self)
     private let presenter = MovieQuizPresenter()
-    var correctAnswers: Int = .zero
+    
     private var moviesLoader: MoviesLoader = MoviesLoader()
     private var statisticService: StatisticService = StatisticServiceImplementation()
     var questionFactory: QuestionFactoryProtocol?
@@ -58,9 +58,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Public Methods
     
     func showAnswerResult(isCorrect: Bool) {
-       if isCorrect {
-           correctAnswers += 1
-       }
+       presenter.didAnswer(isCorrect: isCorrect)
+        
        imageView.layer.masksToBounds = true
        imageView.layer.borderWidth = 8
        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
@@ -68,7 +67,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
            guard let self else { return }
            self.presenter.showNextQuestionOrResults()
-           self.presenter.correctAnswers = self.correctAnswers
            self.presenter.questionFactory = self.questionFactory
        }
    }

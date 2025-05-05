@@ -1,28 +1,37 @@
 import UIKit
 
-final class MovieQuizPresenter {
+final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     // MARK: - Public Properties
     
     var correctAnswers: Int = .zero
     let questionsAmount: Int = 10
-    var questionFactory: QuestionFactoryProtocol?
     var currentQuestion: QuizQuestion?
-    weak var viewController: MovieQuizViewController?
     
     // MARK: - Private Properties
-
+    
+    private let statisticService: StatisticServiceProtocol!
+    private var questionFactory: QuestionFactoryProtocol?
+    weak var viewController: MovieQuizViewController?
     private var currentQuestionIndex: Int = .zero
    
+    // MARK: - Initializers
     
+    init(viewController: MovieQuizViewController) {
+        self.viewController = viewController
+        statisticService = StatisticService()
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        questionFactory?.loadData()
+        viewController.showLoadingIndicator()
+    }
     // MARK: - Public Methods
     
     func yesButtonClicked() {
-        didAnswer(isYes: true)
+        didAnswer(isCorrect: true)
     }
     
     func noButtonClicked() {
-        didAnswer(isYes: false)
+        didAnswer(isCorrect: false)
     }
     
     func isLastQuestion() -> Bool {
@@ -81,11 +90,10 @@ final class MovieQuizPresenter {
     func changeStateButton(isEnabled: Bool) {
         viewController?.setButtonsEnabled(isEnabled)
    }
-    // MARK: - Private Methods
-    
-    private func didAnswer(isYes: Bool) {
+
+    func didAnswer(isCorrect: Bool) {
         guard let currentQuestion else { return }
-        let giveAnswer = isYes
+        let giveAnswer = isCorrect
         viewController?.showAnswerResult(isCorrect: giveAnswer == currentQuestion.correctAnswer)
     }
 }
