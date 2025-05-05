@@ -14,9 +14,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Private Properties
     
     private lazy var alertPresenter = AlertPresenter(viewController: self)
-    private var currentQuestionIndex: Int = .zero
+    private let presenter = MovieQuizPresenter()
     private var correctAnswers: Int = .zero
-    private let questionsAmount: Int = 10
+    
     private var moviesLoader: MoviesLoader = MoviesLoader()
     private var statisticService: StatisticService = StatisticServiceImplementation()
     private var questionFactory: QuestionFactoryProtocol?
@@ -39,7 +39,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question else { return }
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
@@ -66,17 +66,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         guard let currentQuestion else { return }
         changeStateButton(isEnabled:false)
-        showAnswerResult(isCorrect: false == currentQuestion.correctAnswer)
+        showAnswerResult(isCorrect: false == !currentQuestion.correctAnswer)
     }
     
     // MARK: - Private Methods
     
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        return QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-    }
+    
     
     private func showLoadingIndicator() {
         activityIndicator.isHidden = false
@@ -90,7 +85,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                                message: message,
                                buttonText: "Попробовать еще раз") { [weak self] in
             guard let self else { return }
-            self.currentQuestionIndex = 0
+            self.presenter.resetCurrentQuestionIndex()
             self.correctAnswers = 0
             
             self.questionFactory?.requestNextQuestion()
@@ -124,9 +119,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showNextQuestionOrResults() {
         changeStateButton(isEnabled: true)
-        if currentQuestionIndex == questionsAmount - 1 {
-            saveGameResults(correct: correctAnswers, total: questionsAmount)
-            let text = "Ваш результат: \(correctAnswers)/\(questionsAmount)\n" +
+        if presenter.isLastQuestion() {
+            saveGameResults(correct: correctAnswers, total: presenter.questionsAmount)
+            let text = "Ваш результат: \(correctAnswers)/\(presenter.questionsAmount)\n" +
             "Количество сыгранных квизов:\(statisticService.gamesCount)\n" +
             "Рекорд:\(statisticService.bestGame.correct)/\(statisticService.bestGame.total)(\(statisticService.bestGame.date.dateTimeString))\n" +
             "Средняя точность:\(String(format: "%.2f", statisticService.totalAccuracy))%"
@@ -138,7 +133,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         } else {
             imageView.layer.borderWidth = 0
             imageView.layer.borderColor = nil
-            currentQuestionIndex += 1
+            presenter.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
     }
@@ -151,7 +146,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             completion:{ [weak self] in
                 guard let self else { return }
                 
-                self.currentQuestionIndex = 0
+                self.presenter.resetCurrentQuestionIndex()
                 self.correctAnswers = 0
                 self.imageView.layer.borderWidth = 0
                 self.questionFactory?.requestNextQuestion()
