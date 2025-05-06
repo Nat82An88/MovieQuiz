@@ -116,9 +116,10 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     private func proceedToNextQuestionOrResults() {
         if self.isLastQuestion() {
-            let text = correctAnswers == self.questionsAmount ?
-            "Поздравляем, вы ответили на 10 из 10!" :
-            "Вы ответили на \(correctAnswers) из 10, попробуйте ещё раз!"
+            let text = "Ваш результат: \(correctAnswers)/\(questionsAmount)\n" +
+            "Количество сыгранных квизов:\(statisticService.gamesCount)\n" +
+            "Рекорд:\(statisticService.bestGame.correct)/\(statisticService.bestGame.total)(\(statisticService.bestGame.date.dateTimeString))\n" +
+            "Средняя точность:\(String(format: "%.2f", statisticService.totalAccuracy))%"
             let viewModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
                 text: text,
