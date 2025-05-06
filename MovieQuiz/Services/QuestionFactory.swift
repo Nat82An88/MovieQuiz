@@ -46,7 +46,7 @@ class QuestionFactory: QuestionFactoryProtocol {
             let rating = Float(movie.rating) ?? 0
             let randomTreshold = Int.random(in: 5...7)
             let text = "Рейтинг этого фильма больше чем \(randomTreshold)?"
-            let correctAnswer = rating > Float(randomTreshold)
+            let correctAnswer = rating >= Float(randomTreshold)
             let question = QuizQuestion(image: imageData,
                                         text: text,
                                         correctAnswer: correctAnswer)
