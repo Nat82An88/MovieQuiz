@@ -1,13 +1,15 @@
 import Foundation
 
-protocol MoviesLoading {
-    func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void)
-}
-
 struct MoviesLoader: MoviesLoading {
     // MARK: - NetworkClient
     
-    private let networkClient = NetworkClient()
+    private let networkClient: NetworkRouting
+    
+    // MARK: - Initializers
+    
+    init(networkClient: NetworkRouting = NetworkClient()) {
+        self.networkClient = networkClient
+    }
     
     // MARK: - URL
     
